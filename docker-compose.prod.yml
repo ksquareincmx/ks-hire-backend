@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  app:
+    image: ${DOCKER_REPOSITORY_TAG}
+    networks:
+      - kshire
+    env_file:
+      - ./.env
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+    depends_on:
+      - mysql
+    volumes:
+      - .:/usr/src/ks-hire
+      - node_modules:/usr/src/ks-hire/node_modules
+    ports:
+      - 127.0.0.1:${EXTERNAL_SERVER_PORT}:${SERVER_PORT}
+  mysql:
+    image: mysql:5.7.20
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    ports:
+      - 127.0.0.1:${EXTERNAL_DB_PORT}:${DB_PORT}
+    networks:
+      - kshire
+
+volumes:
+  node_modules:
+  mysql-data:
+
+networks:
+  kshire:
